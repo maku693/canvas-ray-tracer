@@ -36,6 +36,8 @@
               z: RAY.z / RAY_NORM
             }
 
+            const sRGB_GAMUT = 1 / 2.2;
+
             let collides = false;
             let color = {
               r: 0,
@@ -60,9 +62,9 @@
 
             // Set color
             const HEAD_INDEX = (y * image.width + x) * 4;
-            image.data[HEAD_INDEX] = color.r;
-            image.data[HEAD_INDEX + 1] = color.g;
-            image.data[HEAD_INDEX + 2] = color.b;
+            image.data[HEAD_INDEX] = color.r ^ sRGB_GAMUT;
+            image.data[HEAD_INDEX + 1] = color.g ^ sRGB_GAMUT;
+            image.data[HEAD_INDEX + 2] = color.b ^ sRGB_GAMUT;
             image.data[HEAD_INDEX + 3] = 255;
           }
         }
