@@ -7,8 +7,8 @@
 <body>
   <canvas id="canvas" width="300" height="200"></canvas>
   <script>
-    (function(){
-      window.addEventListener('DOMContentLoaded', function() {
+    (() => {
+      window.addEventListener('DOMContentLoaded', () => {
         let c = canvas.getContext('2d');
         let image = c.createImageData(canvas.width, canvas.height);
 
