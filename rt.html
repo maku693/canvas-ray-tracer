@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="canvas" width="300" height="200"></canvas>
+  <script>
+    (function(){
+      window.addEventListener('DOMContentLoaded', function() {
+        let c = canvas.getContext('2d');
+        let image = c.createImageData(canvas.width, canvas.height);
+
+        const FOCAL_LENGTH = 0.028;
+        const FILM_WIDTH = 0.036;
+        const FILM_HEIGHT = 0.024;
+
+        for (let y = 0; y < image.height; y++) {
+          for (let x = 0; x < image.width; x++) {
+            const COORDINATES = {
+              x: x / image.width - 0.5,
+              y: y / image.height - 0.5
+            };
+            const RAY = {
+              x: FILM_WIDTH * COORDINATES.x,
+              y: FILM_HEIGHT * COORDINATES.y,
+              z: FOCAL_LENGTH
+            };
+            const RAY_NORM = Math.sqrt(Math.pow(RAY.x, 2) +
+                                       Math.pow(RAY.y, 2) +
+                                       Math.pow(RAY.z, 2));
+            const NORMALIZED_RAY = {
+              x: RAY.x / RAY_NORM,
+              y: RAY.y / RAY_NORM,
+              z: RAY.z / RAY_NORM
+            }
+
+            let collides = false;
+            let color = {
+              r: 0,
+              g: 0,
+              b: 0
+            }
+
+            // TODO: Red Sphere
+            const WALL_NORMAL = {
+              x: 0,
+              y: 0,
+              z: -1
+            }
+            if (WALL_NORMAL.x * NORMALIZED_RAY.x +
+                WALL_NORMAL.y * NORMALIZED_RAY.y +
+                WALL_NORMAL.z * NORMALIZED_RAY.z < 0) {
+              collides = true;
+            }
+            if (collides) {
+              color.r = 255;
+            }
+
+            // Set color
+            const HEAD_INDEX = (y * image.width + x) * 4;
+            image.data[HEAD_INDEX] = color.r;
+            image.data[HEAD_INDEX + 1] = color.g;
+            image.data[HEAD_INDEX + 2] = color.b;
+            image.data[HEAD_INDEX + 3] = 255;
+          }
+        }
+        c.putImageData(image, 0, 0);
+      });
+    }());
+  </script>
+</body>
+</html>
