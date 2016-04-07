@@ -57,14 +57,14 @@
               collides = true;
             }
             if (collides) {
-              color.r = 255;
+              color.r = 1;
             }
 
             // Set color
             const HEAD_INDEX = (y * image.width + x) * 4;
-            image.data[HEAD_INDEX] = color.r ^ sRGB_GAMUT;
-            image.data[HEAD_INDEX + 1] = color.g ^ sRGB_GAMUT;
-            image.data[HEAD_INDEX + 2] = color.b ^ sRGB_GAMUT;
+            image.data[HEAD_INDEX] = Math.pow(color.r, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX + 1] = Math.pow(color.g, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX + 2] = Math.pow(color.b, sRGB_GAMUT) * 255;
             image.data[HEAD_INDEX + 3] = 255;
           }
         }
