@@ -5,9 +5,70 @@
   <title>Document</title>
 </head>
 <body>
-  <canvas id="canvas" width="300" height="200"></canvas>
+  <canvas id="canvas" width="600" height="400"></canvas>
   <script>
     (() => {
+      'use strict';
+      class Vec2 {
+        constructor(options = {}) {
+          this.x = options.x;
+          this.y = options.y;
+        }
+      }
+      class Vec3 {
+        constructor(options = {}) {
+          this.x = options.x;
+          this.y = options.y;
+          this.z = options.z;
+        }
+        getNorm() {
+          return Math.sqrt(Math.pow(this.x, 2) +
+              Math.pow(this.y, 2) +
+              Math.pow(this.z, 2));
+        }
+        normalize() {
+          let norm = this.getNorm();
+          return new Vec3({
+            x: this.x / norm, 
+            y: this.y / norm, 
+            z: this.z / norm
+          });
+        }
+
+        static innerProd(a, b) {
+          return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+      }
+
+      class Ray {
+        constructor(options = {}) {
+          this.center = options.center;
+          this.direction = options.direction;
+        }
+      }
+
+      class Sphere {
+        constructor(options = {}) {
+          this.center = options.center;
+          this.radius = options.radius;
+        }
+        collidesWithRay(ray) {
+          const A = Vec3.innerProd(ray.direction, ray.direction);
+          const B = 2 * (Vec3.innerProd(ray.center, ray.direction) -
+              Vec3.innerProd(ray.direction, this.center))
+          const C = Vec3.innerProd(ray.center, ray.center) +
+            Vec3.innerProd(this.center, this.center) -
+            2 * Vec3.innerProd(this.center, ray.center) -
+            Math.pow(this.radius, 2);
+          const D = Math.pow(B, 2) - 4 * A * C;
+          if (D >= 0) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      }
+
       window.addEventListener('DOMContentLoaded', () => {
         let c = canvas.getContext('2d');
         let image = c.createImageData(canvas.width, canvas.height);
@@ -18,24 +79,21 @@
 
         for (let y = 0; y < image.height; y++) {
           for (let x = 0; x < image.width; x++) {
-            const COORDINATES = {
+            const COORDINATES = new Vec2({
               x: x / image.width - 0.5,
               y: y / image.height - 0.5
-            };
-            const RAY = {
+            });
+            const RAY_CENTER = new Vec3({x: 0, y: 0, z: 0});
+            const RAY_DIRECTION = new Vec3({
               x: FILM_WIDTH * COORDINATES.x,
               y: FILM_HEIGHT * COORDINATES.y,
               z: FOCAL_LENGTH
-            };
-            const RAY_NORM = Math.sqrt(Math.pow(RAY.x, 2) +
-                                       Math.pow(RAY.y, 2) +
-                                       Math.pow(RAY.z, 2));
-            const NORMALIZED_RAY = {
-              x: RAY.x / RAY_NORM,
-              y: RAY.y / RAY_NORM,
-              z: RAY.z / RAY_NORM
-            }
-
+            }).normalize();
+            const RAY = new Ray({
+              center: RAY_CENTER,
+              direction: RAY_DIRECTION
+            });
+                
             const sRGB_GAMUT = 1 / 2.2;
 
             let collides = false;
@@ -45,19 +103,19 @@
               b: 0
             }
 
-            // TODO: Red Sphere
-            const WALL_NORMAL = {
+            // Rendering
+            const SPHERE_CENTER = new Vec3({
               x: 0,
               y: 0,
-              z: -1
-            }
-            if (WALL_NORMAL.x * NORMALIZED_RAY.x +
-                WALL_NORMAL.y * NORMALIZED_RAY.y +
-                WALL_NORMAL.z * NORMALIZED_RAY.z < 0) {
-              collides = true;
-            }
-            if (collides) {
-              color.r = 1;
+              z: -5
+            });
+            const SPHERE_RADIUS = 1.0;
+            const SPHERE = new Sphere({
+              center: SPHERE_CENTER,
+              radius: SPHERE_RADIUS
+            });
+            if (SPHERE.collidesWithRay(RAY)) {
+              color.b = 1;
             }
 
             // Set color
