@@ -10,16 +10,17 @@
     (() => {
       'use strict';
       class Vec2 {
-        constructor(options = {}) {
-          this.x = options.x;
-          this.y = options.y;
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
         }
       }
+
       class Vec3 {
-        constructor(options = {}) {
-          this.x = options.x;
-          this.y = options.y;
-          this.z = options.z;
+        constructor(x, y, z) {
+          this.x = x;
+          this.y = y;
+          this.z = z;
         }
         getNorm() {
           return Math.sqrt(Math.pow(this.x, 2) +
@@ -28,11 +29,12 @@
         }
         normalize() {
           let norm = this.getNorm();
-          return new Vec3({
-            x: this.x / norm, 
-            y: this.y / norm, 
-            z: this.z / norm
-          });
+          return new Vec3(
+            this.x / norm, 
+            this.y / norm, 
+            this.z / norm
+          );
+        }
         }
 
         static innerProd(a, b) {
@@ -41,16 +43,17 @@
       }
 
       class Ray {
-        constructor(options = {}) {
-          this.center = options.center;
-          this.direction = options.direction;
+        constructor(center, direction) {
+          this.center = center;
+          this.direction = direction;
         }
       }
 
       class Sphere {
-        constructor(options = {}) {
-          this.center = options.center;
-          this.radius = options.radius;
+        constructor(center, radius) {
+          this.center = center;
+          this.radius = radius;
+        }
         }
         collidesWithRay(ray) {
           const A = Vec3.innerProd(ray.direction, ray.direction);
@@ -79,20 +82,12 @@
 
         for (let y = 0; y < image.height; y++) {
           for (let x = 0; x < image.width; x++) {
-            const COORDINATES = new Vec2({
-              x: x / image.width - 0.5,
-              y: y / image.height - 0.5
-            });
-            const RAY_CENTER = new Vec3({x: 0, y: 0, z: 0});
-            const RAY_DIRECTION = new Vec3({
-              x: FILM_WIDTH * COORDINATES.x,
-              y: FILM_HEIGHT * COORDINATES.y,
-              z: FOCAL_LENGTH
-            }).normalize();
-            const RAY = new Ray({
-              center: RAY_CENTER,
-              direction: RAY_DIRECTION
-            });
+            const COORDINATES = new Vec2(x / image.width - 0.5,
+                y / image.height - 0.5);
+            const RAY_CENTER = new Vec3(0, 0, 0);
+            const RAY_DIRECTION = new Vec3(FILM_WIDTH * COORDINATES.x,
+                FILM_HEIGHT * COORDINATES.y, FOCAL_LENGTH).normalize();
+            const RAY = new Ray(RAY_CENTER, RAY_DIRECTION);
                 
             const sRGB_GAMUT = 1 / 2.2;
 
@@ -104,16 +99,9 @@
             }
 
             // Rendering
-            const SPHERE_CENTER = new Vec3({
-              x: 0,
-              y: 0,
-              z: -5
-            });
+            const SPHERE_CENTER = new Vec3(0, 0, -5);
             const SPHERE_RADIUS = 1.0;
-            const SPHERE = new Sphere({
-              center: SPHERE_CENTER,
-              radius: SPHERE_RADIUS
-            });
+            const SPHERE = new Sphere(SPHERE_CENTER, SPHERE_RADIUS);
             if (SPHERE.collidesWithRay(RAY)) {
               color.b = 1;
             }
