@@ -35,8 +35,17 @@
             this.z / norm
           );
         }
+        multiply(x) {
+          return new Vec3(
+            this.x * x,
+            this.y * x,
+            this.z * x
+          );
         }
 
+        static subtract(a, b) {
+          return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
         static innerProd(a, b) {
           return a.x * b.x + a.y * b.y + a.z * b.z;
         }
