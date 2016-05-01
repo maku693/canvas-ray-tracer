@@ -102,6 +102,7 @@
         let c = canvas.getContext('2d');
         let image = c.createImageData(canvas.width, canvas.height);
 
+        const sRGB_GAMUT = 1 / 2.2;
         const FOCAL_LENGTH = 0.028;
         const FILM_WIDTH = 0.036;
         const FILM_HEIGHT = 0.024;
@@ -114,29 +115,22 @@
             const RAY_DIRECTION = new Vec3(FILM_WIDTH * COORDINATES.x,
                 FILM_HEIGHT * COORDINATES.y, FOCAL_LENGTH).normalize();
             const RAY = new Ray(RAY_CENTER, RAY_DIRECTION);
-                
-            const sRGB_GAMUT = 1 / 2.2;
 
-            let collides = false;
-            let color = {
-              r: 0,
-              g: 0,
-              b: 0
-            }
+            let color = new Vec3(0, 0, 0);
 
             // Rendering
             const SPHERE_CENTER = new Vec3(0, 0.5, -5);
             const SPHERE_RADIUS = 1.0;
             const SPHERE = new Sphere(SPHERE_CENTER, SPHERE_RADIUS);
             if (SPHERE.collidesWithRay(RAY)) {
-              color.b = 1;
+              color.z = 1;
             }
 
             // Set color
             const HEAD_INDEX = (y * image.width + x) * 4;
-            image.data[HEAD_INDEX] = Math.pow(color.r, sRGB_GAMUT) * 255;
-            image.data[HEAD_INDEX + 1] = Math.pow(color.g, sRGB_GAMUT) * 255;
-            image.data[HEAD_INDEX + 2] = Math.pow(color.b, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX] = Math.pow(color.x, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX + 1] = Math.pow(color.y, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX + 2] = Math.pow(color.z, sRGB_GAMUT) * 255;
             image.data[HEAD_INDEX + 3] = 255;
           }
         }
