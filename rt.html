@@ -63,6 +63,23 @@
           this.center = center;
           this.radius = radius;
         }
+        getIntersectionPointWithRay(ray) {
+          const A = Vec3.innerProd(ray.direction, ray.direction);
+          const B = 2 * (Vec3.innerProd(ray.center, ray.direction) -
+              Vec3.innerProd(ray.direction, this.center))
+          const C = Vec3.innerProd(ray.center, ray.center) +
+            Vec3.innerProd(this.center, this.center) -
+            2 * Vec3.innerProd(this.center, ray.center) -
+            Math.pow(this.radius, 2);
+          const D = Math.pow(B, 2) - 4 * A * C;
+          if (D >= 0) {
+            return null;
+          }
+          const T = (-1 * B + Math.sqrt(D)) / 2 * A;
+          return ray.direction.multiply(T).normalize();
+        }
+        getNormalForIntersectionPoint(point) {
+          return Vec3.subtract(point, this.center);
         }
         collidesWithRay(ray) {
           const A = Vec3.innerProd(ray.direction, ray.direction);
