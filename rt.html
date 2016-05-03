@@ -79,7 +79,7 @@
           return ray.direction.multiply(T).normalize();
         }
         getNormalForIntersectionPoint(point) {
-          return Vec3.subtract(point, this.center);
+          return Vec3.subtract(point, this.center).normalize();
         }
         collidesWithRay(ray) {
           const A = Vec3.innerProd(ray.direction, ray.direction);
