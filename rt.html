@@ -113,6 +113,7 @@
         let c = canvas.getContext('2d');
         let image = c.createImageData(canvas.width, canvas.height);
 
+        const sRGB_GAMUT = 1 / 2.2;
         const FOCAL_LENGTH = 0.028;
         const FILM_WIDTH = 0.036;
         const FILM_HEIGHT = 0.024;
@@ -121,7 +122,7 @@
         const SPHERE_RADIUS = 1.0;
         const SPHERE = new Sphere(SPHERE_CENTER, SPHERE_RADIUS);
         const LIGHT = new Light(new Vec3(-5, 5, 5));
-        const MATERIAL = new Material(new Vec3(0.75, 0.75, 1));
+        const MATERIAL = new Material(new Vec3(0.75, 0.75, 0.75));
 
         for (let y = 0; y < image.height; y++) {
           for (let x = 0; x < image.width; x++) {
@@ -150,6 +151,9 @@
             image.data[HEAD_INDEX] = color.x * 255;
             image.data[HEAD_INDEX + 1] = color.y * 255;
             image.data[HEAD_INDEX + 2] = color.z * 255;
+            image.data[HEAD_INDEX] = Math.pow(color.x, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX + 1] = Math.pow(color.y, sRGB_GAMUT) * 255;
+            image.data[HEAD_INDEX + 2] = Math.pow(color.z, sRGB_GAMUT) * 255;
             image.data[HEAD_INDEX + 3] = 255;
           }
         }
