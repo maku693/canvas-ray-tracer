@@ -102,14 +102,16 @@
                 -(y / image.height) + 0.5);
             const CAMERA_POSITION = new Vec3(0, 0, 0);
             const RAY_DIRECTION = Vec3.normalize(
-                new Vec3(FILM_WIDTH * COORDINATES.x,
-                  FILM_HEIGHT * COORDINATES.y, FOCAL_LENGTH));
+                new Vec3(
+                  FILM_WIDTH * COORDINATES.x,
+                  FILM_HEIGHT * COORDINATES.y,
+                  -FOCAL_LENGTH));
             const RAY = new Ray(CAMERA_POSITION, RAY_DIRECTION);
 
             let color = new Vec3(0, 0, 0);
 
             // Rendering
-            const SPHERE_CENTER = new Vec3(0, 0, 5);
+            const SPHERE_CENTER = new Vec3(0, 0, -5);
             const SPHERE_RADIUS = 1.0;
             const SPHERE = new Sphere(SPHERE_CENTER, SPHERE_RADIUS);
             const INTERSECTION_POINT = SPHERE.getIntersectionPointWithRay(RAY);
