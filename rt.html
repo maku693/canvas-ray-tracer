@@ -22,38 +22,34 @@
           this.y = y;
           this.z = z;
         }
-        getNorm() {
-          return Math.sqrt(Math.pow(this.x, 2) +
-              Math.pow(this.y, 2) +
-              Math.pow(this.z, 2));
-        }
-        normalize() {
-          let norm = this.getNorm();
-          return new Vec3(
-            this.x / norm, 
-            this.y / norm, 
-            this.z / norm
-          );
-        }
-        multiply(x) {
-          return new Vec3(
-            this.x * x,
-            this.y * x,
-            this.z * x
-          );
-        }
 
+        static add(a, b) {
+          return new Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
         static subtract(a, b) {
           return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
         }
-        static innerProd(a, b) {
+        static scale(a, b) {
+          return new Vec3(a.x * b, a.y * b, a.z * b);
+        }
+        static normalize(a) {
+          let length = Vec3.length(a);
+          return new Vec3(a.x / length, a.y / length, a.z / length);
+        }
+        static dot(a, b) {
           return a.x * b.x + a.y * b.y + a.z * b.z;
+        }
+        static squaredLength(a) {
+          return Vec3.dot(a, a);
+        }
+        static length(a) {
+          return Math.sqrt(Vec3.squaredLength(a));
         }
       }
 
       class Ray {
-        constructor(center, direction) {
-          this.center = center;
+        constructor(origin, direction) {
+          this.origin = origin;
           this.direction = direction;
         }
       }
@@ -64,37 +60,29 @@
           this.radius = radius;
         }
         getIntersectionPointWithRay(ray) {
-          const A = Vec3.innerProd(ray.direction, ray.direction);
-          const B = 2 * (Vec3.innerProd(ray.center, ray.direction) -
-              Vec3.innerProd(ray.direction, this.center))
-          const C = Vec3.innerProd(ray.center, ray.center) +
-            Vec3.innerProd(this.center, this.center) -
-            2 * Vec3.innerProd(this.center, ray.center) -
-            Math.pow(this.radius, 2);
-          const D = Math.pow(B, 2) - 4 * A * C;
-          if (D >= 0) {
+          const V = Vec3.subtract(ray.origin, this.center);
+          const B = Vec3.dot(V, ray.direction);
+          const C = Vec3.squaredLength(V) - Math.pow(this.radius, 2);
+          const D = Math.pow(B, 2) - C;
+          if (D < 0) {
             return null;
           }
-          const T = (-1 * B + Math.sqrt(D)) / 2 * A;
-          return ray.direction.multiply(T).normalize();
+          const T1 = -1 * B + Math.sqrt(D);
+          const T2 = -1 * B - Math.sqrt(D);
+          let T;
+          if (T1 <= 0 && T2 <= 0) {
+            return null;
+          } else if (T1 <= 0 && T2 > 0) {
+            T = T2;
+          } else if (T1 > 0 && T2 <=0) {
+            T = T1;
+          } else {
+            T = Math.min(T1, T2);
+          }
+          return Vec3.scale(ray.direction, T);
         }
         getNormalForIntersectionPoint(point) {
-          return Vec3.subtract(point, this.center).normalize();
-        }
-        collidesWithRay(ray) {
-          const A = Vec3.innerProd(ray.direction, ray.direction);
-          const B = 2 * (Vec3.innerProd(ray.center, ray.direction) -
-              Vec3.innerProd(ray.direction, this.center))
-          const C = Vec3.innerProd(ray.center, ray.center) +
-            Vec3.innerProd(this.center, this.center) -
-            2 * Vec3.innerProd(this.center, ray.center) -
-            Math.pow(this.radius, 2);
-          const D = Math.pow(B, 2) - 4 * A * C;
-          if (D >= 0) {
-            return true;
-          } else {
-            return false;
-          }
+          return Vec3.normalize(Vec3.subtract(point, this.center));
         }
       }
 
