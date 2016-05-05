@@ -98,7 +98,7 @@
         for (let y = 0; y < image.height; y++) {
           for (let x = 0; x < image.width; x++) {
             const COORDINATES = new Vec2(x / image.width - 0.5,
-                y / image.height - 0.5);
+                -(y / image.height) + 0.5);
             const RAY_CENTER = new Vec3(0, 0, 0);
             const RAY_DIRECTION = Vec3.normalize(
                 new Vec3(FILM_WIDTH * COORDINATES.x,
