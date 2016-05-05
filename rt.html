@@ -29,6 +29,9 @@
         static subtract(a, b) {
           return new Vec3(a.x - b.x, a.y - b.y, a.z - b.z);
         }
+        static multiply(a, b) {
+          return new Vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+        }
         static scale(a, b) {
           return new Vec3(a.x * b, a.y * b, a.z * b);
         }
@@ -86,6 +89,26 @@
         }
       }
 
+      class Light {
+        constructor(position) {
+          this.position = position;
+        }
+      }
+
+      class Material {
+        constructor(diffuse) {
+          this.diffuse = diffuse;
+        }
+        getColor(light, intersectionPoint, normal) {
+          const LIGHT_DIRECTION = Vec3.normalize(Vec3.subtract(
+                light.position,
+                intersectionPoint));
+          return Vec3.scale(
+              this.diffuse,
+              Vec3.dot(normal, LIGHT_DIRECTION));
+        }
+      }
+
       window.addEventListener('DOMContentLoaded', () => {
         let c = canvas.getContext('2d');
         let image = c.createImageData(canvas.width, canvas.height);
@@ -97,6 +120,8 @@
         const SPHERE_CENTER = new Vec3(0, 0, -5);
         const SPHERE_RADIUS = 1.0;
         const SPHERE = new Sphere(SPHERE_CENTER, SPHERE_RADIUS);
+        const LIGHT = new Light(new Vec3(-5, 5, 5));
+        const MATERIAL = new Material(new Vec3(0.75, 0.75, 1));
 
         for (let y = 0; y < image.height; y++) {
           for (let x = 0; x < image.width; x++) {
@@ -116,7 +141,8 @@
             if (INTERSECTION_POINT !== null) {
               const NORMAL =
                 SPHERE.getNormalForIntersectionPoint(INTERSECTION_POINT);
-              color = NORMAL;
+              color = MATERIAL.getColor(LIGHT, INTERSECTION_POINT, NORMAL);
+              // color = NORMAL;
             }
 
             // Set color
