@@ -100,7 +100,6 @@
   }
 
   function traceRay(coordinate) {
-    const sRGB_GAMUT = 1 / 2.2;
     const FOCAL_LENGTH = 0.028;
     const FILM_WIDTH = 0.036;
     const FILM_HEIGHT = 0.024;
@@ -123,23 +122,25 @@
       const NORMAL = SPHERE.normalForIntersectionPoint(INTERSECTION_POINT);
       color = MATERIAL.getColor(LIGHT, INTERSECTION_POINT, NORMAL);
     }
-    // Gamut correction
-    return Vec3.pow(color, sRGB_GAMUT);
+    return color;
   }
 
   window.addEventListener('DOMContentLoaded', () => {
     let c = canvas.getContext('2d');
     let image = c.createImageData(canvas.width, canvas.height);
+    const sRGB_GAMUT = 1 / 2.2;
 
     for (let y = 0; y < image.height; y++) {
       for (let x = 0; x < image.width; x++) {
         const COORDINATE = new Vec2(x / image.width - 0.5, -(y / image.height) + 0.5);
         const COLOR = traceRay(COORDINATE);
+        // Gamut correction
+        const CORRECTED_COLOR = Vec3.pow(COLOR, sRGB_GAMUT);
         // Set color
         const HEAD_INDEX = (y * image.width + x) * 4;
-        image.data[HEAD_INDEX] = COLOR.x * 255;
-        image.data[HEAD_INDEX + 1] = COLOR.y * 255;
-        image.data[HEAD_INDEX + 2] = COLOR.z * 255;
+        image.data[HEAD_INDEX] = CORRECTED_COLOR.x * 255;
+        image.data[HEAD_INDEX + 1] = CORRECTED_COLOR.y * 255;
+        image.data[HEAD_INDEX + 2] = CORRECTED_COLOR.z * 255;
         image.data[HEAD_INDEX + 3] = 255;
       }
     }
