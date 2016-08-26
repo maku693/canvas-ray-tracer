@@ -65,17 +65,14 @@
       if (D < 0) {
         return null;
       }
-      let T;
       const T1 = -1 * B + Math.sqrt(D);
       const T2 = -1 * B - Math.sqrt(D);
-      if (T1 <= 0 && T2 <= 0) {
+      if (T1 < 0 && T2 < 0) {
         return null;
-      } else if (T1 <= 0 && T2 > 0) {
-        T = T2;
-      } else if (T1 > 0 && T2 <=0) {
-        T = T1;
-      } else {
-        T = Math.min(T1, T2);
+      }
+      const T = Math.min(T1, T2);
+      if (T < 0) {
+        return null;
       }
       return Vec3.scale(ray.direction, T);
     }
