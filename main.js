@@ -102,10 +102,7 @@
     }
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    let c = canvas.getContext('2d');
-    let image = c.createImageData(canvas.width, canvas.height);
-
+  function traceRay(coordinate) {
     const sRGB_GAMUT = 1 / 2.2;
     const FOCAL_LENGTH = 0.028;
     const FILM_WIDTH = 0.036;
@@ -117,27 +114,35 @@
     const LIGHT = new Light(new Vec3(-5, 5, 5));
     const MATERIAL = new Material(new Vec3(0.75, 0.75, 0.75));
 
+    const RAY_DIRECTION = Vec3.normalize(
+      new Vec3(FILM_WIDTH * coordinate.x, FILM_HEIGHT * coordinate.y, -FOCAL_LENGTH)
+    );
+    const RAY = new Ray(CAMERA_POSITION, RAY_DIRECTION);
+    let color = new Vec3(0, 0, 0);
+
+    // Rendering
+    const INTERSECTION_POINT = SPHERE.getIntersectionPointWithRay(RAY);
+    if (INTERSECTION_POINT !== null) {
+      const NORMAL = SPHERE.getNormalForIntersectionPoint(INTERSECTION_POINT);
+      color = MATERIAL.getColor(LIGHT, INTERSECTION_POINT, NORMAL);
+    }
+    // Gamut correction
+    return Vec3.pow(color, sRGB_GAMUT);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    let c = canvas.getContext('2d');
+    let image = c.createImageData(canvas.width, canvas.height);
+
     for (let y = 0; y < image.height; y++) {
       for (let x = 0; x < image.width; x++) {
-        const COORDINATES = new Vec2(x / image.width - 0.5, -(y / image.height) + 0.5);
-        const RAY_DIRECTION = Vec3.normalize(
-          new Vec3(FILM_WIDTH * COORDINATES.x, FILM_HEIGHT * COORDINATES.y, -FOCAL_LENGTH)
-        );
-        const RAY = new Ray(CAMERA_POSITION, RAY_DIRECTION);
-        let color = new Vec3(0, 0, 0);
-
-        // Rendering
-        const INTERSECTION_POINT = SPHERE.getIntersectionPointWithRay(RAY);
-        if (INTERSECTION_POINT !== null) {
-          const NORMAL = SPHERE.getNormalForIntersectionPoint(INTERSECTION_POINT);
-          color = MATERIAL.getColor(LIGHT, INTERSECTION_POINT, NORMAL);
-        }
-
+        const COORDINATE = new Vec2(x / image.width - 0.5, -(y / image.height) + 0.5);
+        const COLOR = traceRay(COORDINATE);
         // Set color
         const HEAD_INDEX = (y * image.width + x) * 4;
-        image.data[HEAD_INDEX] = Math.pow(color.x, sRGB_GAMUT) * 255;
-        image.data[HEAD_INDEX + 1] = Math.pow(color.y, sRGB_GAMUT) * 255;
-        image.data[HEAD_INDEX + 2] = Math.pow(color.z, sRGB_GAMUT) * 255;
+        image.data[HEAD_INDEX] = COLOR.x * 255;
+        image.data[HEAD_INDEX + 1] = COLOR.y * 255;
+        image.data[HEAD_INDEX + 2] = COLOR.z * 255;
         image.data[HEAD_INDEX + 3] = 255;
       }
     }
