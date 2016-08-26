@@ -126,24 +126,24 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    let c = canvas.getContext('2d');
-    let image = c.createImageData(canvas.width, canvas.height);
+    const C = canvas.getContext('2d');
+    const IMAGE_DATA = C.createImageData(canvas.width, canvas.height);
     const sRGB_GAMUT = 1 / 2.2;
 
-    for (let y = 0; y < image.height; y++) {
-      for (let x = 0; x < image.width; x++) {
-        const COORDINATE = new Vec2(x / image.width - 0.5, -(y / image.height) + 0.5);
+    for (let y = 0; y < IMAGE_DATA.height; y++) {
+      for (let x = 0; x < IMAGE_DATA.width; x++) {
+        const COORDINATE = new Vec2(x / IMAGE_DATA.width - 0.5, -(y / IMAGE_DATA.height) + 0.5);
         const COLOR = traceRay(COORDINATE);
         // Gamut correction
         const CORRECTED_COLOR = Vec3.pow(COLOR, sRGB_GAMUT);
         // Set color
-        const HEAD_INDEX = (y * image.width + x) * 4;
-        image.data[HEAD_INDEX] = CORRECTED_COLOR.x * 255;
-        image.data[HEAD_INDEX + 1] = CORRECTED_COLOR.y * 255;
-        image.data[HEAD_INDEX + 2] = CORRECTED_COLOR.z * 255;
-        image.data[HEAD_INDEX + 3] = 255;
+        const HEAD_INDEX = (y * IMAGE_DATA.width + x) * 4;
+        IMAGE_DATA.data[HEAD_INDEX] = CORRECTED_COLOR.x * 255;
+        IMAGE_DATA.data[HEAD_INDEX + 1] = CORRECTED_COLOR.y * 255;
+        IMAGE_DATA.data[HEAD_INDEX + 2] = CORRECTED_COLOR.z * 255;
+        IMAGE_DATA.data[HEAD_INDEX + 3] = 255;
       }
     }
-    c.putImageData(image, 0, 0);
+    C.putImageData(IMAGE_DATA, 0, 0);
   });
 })();
