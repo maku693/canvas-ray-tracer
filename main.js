@@ -40,6 +40,9 @@
     static length(a) {
       return Math.sqrt(Vec3.squaredLength(a));
     }
+    static pow(a, b) {
+      return new Vec3(Math.pow(a.x, b), Math.pow(a.y, b), Math.pow(a.z, b));
+    }
   }
 
   class Ray {
