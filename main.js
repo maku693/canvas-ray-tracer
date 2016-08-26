@@ -57,7 +57,7 @@
       this.center = center;
       this.radius = radius;
     }
-    getIntersectionPointWithRay(ray) {
+    intersectionPointWithRay(ray) {
       const V = Vec3.subtract(ray.origin, this.center);
       const B = Vec3.dot(V, ray.direction);
       const C = Vec3.squaredLength(V) - Math.pow(this.radius, 2);
@@ -79,7 +79,7 @@
       }
       return Vec3.scale(ray.direction, T);
     }
-    getNormalForIntersectionPoint(point) {
+    normalForIntersectionPoint(point) {
       return Vec3.normalize(Vec3.subtract(point, this.center));
     }
   }
@@ -121,9 +121,9 @@
     let color = new Vec3(0, 0, 0);
 
     // Rendering
-    const INTERSECTION_POINT = SPHERE.getIntersectionPointWithRay(RAY);
+    const INTERSECTION_POINT = SPHERE.intersectionPointWithRay(RAY);
     if (INTERSECTION_POINT !== null) {
-      const NORMAL = SPHERE.getNormalForIntersectionPoint(INTERSECTION_POINT);
+      const NORMAL = SPHERE.normalForIntersectionPoint(INTERSECTION_POINT);
       color = MATERIAL.getColor(LIGHT, INTERSECTION_POINT, NORMAL);
     }
     // Gamut correction
