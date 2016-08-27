@@ -104,9 +104,7 @@
     const FILM_WIDTH = 0.036;
     const FILM_HEIGHT = 0.024;
     const CAMERA_POSITION = new Vec3(0, 0, 0);
-    const SPHERE_CENTER = new Vec3(0, 0, -5);
-    const SPHERE_RADIUS = 1.0;
-    const SPHERE = new Sphere(SPHERE_CENTER, SPHERE_RADIUS);
+    const SPHERE = new Sphere(new Vec3(0, 0, -5), 1.0);
     const LIGHT = new Light(new Vec3(-5, 5, 5));
     const MATERIAL = new Material(new Vec3(0.75, 0.75, 0.75));
 
